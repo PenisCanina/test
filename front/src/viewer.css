@@ -1,0 +1,23 @@
+.Tree {
+    overflow: hidden;
+    outline: 0px solid blue ;
+    grid-row: 1/span 2;
+}
+
+.tree-branch {
+    border: 0px solid red;
+    margin-left : 20px;
+    margin-bot: 20px auto;
+}
+
+.tree-leaf {
+    border: 0px solid green;
+    margin-left: 20px;
+    margin-bot: 100px auto;
+}
+.box {
+    height :400px;
+    border-radius: 10px;
+    background: grey;
+    margin: 20px auto;
+}
