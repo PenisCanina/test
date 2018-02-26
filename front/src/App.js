@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import Constructor from'./Constructor'
 import Tree from './Tree';
-import './viewer.css';
+import  './tree.css'
 
 
 class App extends Component {
@@ -26,26 +26,23 @@ class App extends Component {
                 this.setState({
                 received: resp.data.result
                 })
-                //console.log('received: ', this.state.received)
                 if(this.state.received != "") {
-                    console.log(this.state.received )
+                    //console.log(this.state.received )
                     let treeData = [JSON.parse(this.state.received)];
                     this.setState({
                         tree: treeData.map(function (child) {
                             return <Tree
                                 key={child.id}
                                 data={child}
-                                opened={true}
                                 callbackFromParent = {this.IdCallBack.bind(this)}
                             />
                         }.bind(this))
                     })
                 }
-                //console.log('tree: ',this.state.tree)
+
             }
         )
-        console.log('render request', this.state.tree)
-        this.render()
+        this.setState({})
     }
 
     ChildAdd(id, name, img) {
@@ -53,16 +50,30 @@ class App extends Component {
         params.set('name', name);
         params.set('image', img);
         axios.post('http://localhost:3001/add?id='+id, params)
-            .then( resp => console.log(resp.data))
+            .then( resp => {
+                console.log(resp.data)
+                this.FetchTree();
+            })
             .catch( err => console.log(err))
-        this.FetchTree();
+
+    }
+
+    ChildKill (id){
+        axios.delete('http://localhost:3001/kill?id='+id)
+            .then( resp => {
+                console.log(resp.data)
+                this.FetchTree();
+            })
+            .catch( err => console.log(err))
     }
 
     DataCallback = (FormData) => {
         this.setState({constructorUp:false});
         console.log('ADD_CHILD:',FormData.name, ' ', FormData.image,' to ', this.state.currentId);
-        this.ChildAdd(this.state.currentId.id, FormData.name, FormData.image);
-        this.FetchTree();
+        if (this.state.currentId.type == 'ADD') {
+            this.ChildAdd(this.state.currentId.id, FormData.name, FormData.image)
+        }
+
     }
 
 
@@ -70,19 +81,26 @@ class App extends Component {
         this.setState({currentId:FromChild});
         console.log(FromChild)
         this.setState({constructorUp: FromChild['type'] == 'ADD'?true:false})
+        if(FromChild['type'] == 'KILL'){
+            this.ChildKill(FromChild['id'])
+            this.FetchTree();
+        }
     }
 
     renderConstructor(DataCallback) {
             return (<Constructor callbackFromParent = {DataCallback} />)
     }
     render() {
-        console.log('rendered', this.state.tree)
-
         return (
-            <body className= 'viewer'>
+            <div>
                 {this.state.constructorUp ? this.renderConstructor(this.DataCallback.bind(this)) : null }
-                {this.state.tree}
-            </body>
+
+                <div class = "tree" >
+                <ul>
+                    {this.state.tree}
+                </ul>
+            </div>
+            </div>
           )
   }
 }

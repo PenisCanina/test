@@ -1,48 +1,37 @@
 import React, {Component} from 'react';
-import Constructor from "./Constructor";
+
 export default class Tree extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             node: {name:'', image:''},
-            isOpened: props.opened,
             ConstructorUp : false,
             Children : props.data.children
-            //TODO: ADD LOCAL STATE TREE STRUCTURE
         };
-        this.subtree = this.buildSubtree();
+
     }
-    subtree = null;
+
     componentWillReceiveProps(newProps) {
         this.setState({
-            isOpened: !newProps.opened
-        });
-        this.subtree = this.buildSubtree();
+            Children : newProps.data.children
+            });
     }
 
-    toggleState() {
-        this.setState({
-            isOpened: !this.state.isOpened
-        });
-        this.subtree = this.buildSubtree()
-    }
-
-    buildSubtree() {
+    buildSubtree(children) {
         let subtree = null;
-        if (this.props.data.children)
+        if (children.length > 0)
         {
-            subtree = this.props.data.children.map(function (child)
+            subtree = children.map(function (child)
             {
                 return <Tree
                     key={child.id}
                     data={child}
-                    opened = {this.state.isOpened}
                     callbackFromParent = {this.PassUpdate.bind(this)}
                 />
             }.bind(this));
         }
-        return subtree;
+        return subtree
     }
     UpdateSelf = (eventType) => {
         let Id = {id:this.props.data.id, type: eventType};
@@ -55,48 +44,45 @@ export default class Tree extends Component {
 
     handleAdd(eventType,event) {
         event.preventDefault();
+
         this.UpdateSelf(eventType);
     }
-
+    subtree = null
     render() {
-        let TreeText;
-        if (this.state.isOpened) {
-            TreeText = <div>Works</div>
-        }
-        else {
-            TreeText = <div>Idle</div>
-        }
-
-        if (this.subtree) {
+        this.subtree = this.buildSubtree(this.state.Children)
+        if (this.subtree != null) {
             return (
-                <div className='tree-branch' style={{display: 'table', align : 'center', height: 100}}>
-                    <a data-id={this.props.data.id} onClick={this.toggleState.bind(this)}>
-                        <box className="box" >
-                            {this.props.data.name}
-                            {this.props.data.image}
-                            <button onClick={this.handleAdd.bind(this,'ADD')}>+</button>
+                    <li>
+                    <a  data-id={this.props.data.id}>
+                        <div>
+                            <div>
+                                {this.props.data.name}
+                            </div>
+                            <img src = {this.props.data.image} width={40} height={40}/>
                             <button onClick={this.handleAdd.bind(this,'KILL')}>-</button>
-                        </box>
+                            <button onClick={this.handleAdd.bind(this,'ADD')}>+</button>
+                        </div>
                     </a>
-                    <div className='tree-branch' style={{display:'inline-block', position: 'relative'}}>
+                    <ul>
                         {this.subtree}
-
-                    </div>
-                </div>
+                    </ul>
+                    </li>
             );
         }
         else {
             return (
-                <div  className='tree-leaf' >
-                    <a data-id = {this.props.data.id} onClick={this.toggleState.bind(this)}>
-                        <box className="box">
-                            {this.props.data.name}
-                            {this.props.data.image}
-                            <button onClick={this.handleAdd.bind(this,'ADD')}>+</button>
+                <li>
+                    <a data-id = {this.props.data.id}>
+                        <div>
+                            <div>
+                                {this.props.data.name}
+                            </div>
+                            <img src = {this.props.data.image} width={48} height={48}/>
                             <button onClick={this.handleAdd.bind(this,'KILL')}>-</button>
-                        </box>
+                            <button onClick={this.handleAdd.bind(this,'ADD')}>+</button>
+                        </div>
                     </a>
-                </div>
+                </li>
             );
         }
     }

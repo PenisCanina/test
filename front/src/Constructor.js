@@ -52,9 +52,7 @@ class Constructor extends Component {
                     value = {this.state.node.image}
                     onChange = {this.handleChange('image')}>
                 </input>
-                <button onClick={this.handleSubmit.bind(this)}>
-
-                </button>
+                <button onClick={this.handleSubmit.bind(this)}>+</button>
             </form>
         )
     }
