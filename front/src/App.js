@@ -13,9 +13,8 @@ class App extends Component {
     {
         super(props)
         this.state = {
-            currentId : null,
+            currentId : {id: null, type : null},
             constructorUp: false,
-            received : null,
             tree: null
         }
         this.FetchTree()
@@ -23,12 +22,9 @@ class App extends Component {
     FetchTree() {
         axios.get('http://localhost:3001/tree').then(
             resp => {
-                this.setState({
-                received: resp.data.result
-                })
-                if(this.state.received != "") {
+                if(resp.data.result != "") {
                     //console.log(this.state.received )
-                    let treeData = [JSON.parse(this.state.received)];
+                    let treeData = [JSON.parse(resp.data.result)];
                     this.setState({
                         tree: treeData.map(function (child) {
                             return <Tree
@@ -38,11 +34,13 @@ class App extends Component {
                             />
                         }.bind(this))
                     })
+                } else {
+                    this.setState({constructorUp: true, currentId : {id : 0, type : 'ADD'}, tree : null})
                 }
 
             }
         )
-        this.setState({})
+        //this.setState({})
     }
 
     ChildAdd(id, name, img) {
@@ -90,12 +88,13 @@ class App extends Component {
     renderConstructor(DataCallback) {
             return (<Constructor callbackFromParent = {DataCallback} />)
     }
+
     render() {
         return (
             <div>
                 {this.state.constructorUp ? this.renderConstructor(this.DataCallback.bind(this)) : null }
 
-                <div class = "tree" >
+                <div className= "tree" >
                 <ul>
                     {this.state.tree}
                 </ul>

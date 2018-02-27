@@ -4,10 +4,34 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	 "encoding/json"
+	"os"
 )
 
+
+
 func main() {
-	db, err := sql.Open("mysql", "root:55555@tcp(127.0.0.1:3306)/gotest")
+
+	type Configurations struct {
+		User string
+		Password string
+		Host string
+		Db string
+		ServerPort string
+	}
+
+	file, _:= os.Open("config.json")
+	decode := json.NewDecoder(file)
+	config := Configurations{}
+	err := decode.Decode(&config)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	connect := config.User + ":" + config.Password +"@tcp("+config.Host+")/"+ config.Db
+
+
+
+	db, err := sql.Open("mysql", connect)
 	if err != nil {
 		fmt.Print(err.Error())
 	}
@@ -34,7 +58,7 @@ func main() {
 	if err != nil {
 		fmt.Print(err.Error())
 	} else {
-		fmt.Printf("tree table is operational")
-		fmt.Print("presentаtion dаtа loаded")
+		fmt.Println("tree table is operational")
+		fmt.Println("presentаtion dаtа loаded")
 	}
 }

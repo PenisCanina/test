@@ -1,0 +1,7 @@
+{
+  "User": "root",
+  "Password" : "55555",
+  "Host": "127.0.0.1:3306",
+  "Db" : "gotest"
+}
+//User:Password@tcp(Host)/Db

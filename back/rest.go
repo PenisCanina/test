@@ -1,42 +1,48 @@
 package main
 
 import (
-	_"bytes"
 	"database/sql"
 	"fmt"
+	"os"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	_"log"
+
 	"log"
+	"github.com/gin-gonic/gin/json"
 )
 
+
+
 func main() {
-	db, err := sql.Open("mysql", "root:55555@tcp(127.0.0.1:3306)/gotest")
+
+	type Configurations struct {
+		User string
+		Password string
+		Host string
+		Db string
+		ServerPort string
+	}
+
+	file, _:= os.Open("config.json")
+	decode := json.NewDecoder(file)
+	config := Configurations{}
+	err := decode.Decode(&config)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	connect := config.User + ":" + config.Password +"@tcp("+config.Host+")/"+ config.Db
+
+	db, err := sql.Open("mysql", connect)
 	if err != nil {
 		fmt.Print(err.Error())
 	}
 	defer db.Close()
-	// make sure connection is available
 	err = db.Ping()
 	if err != nil {
 		fmt.Print(err.Error())
-	}
-
-	type Person struct {
-		Id         int
-		First_Name string
-		Last_Name  string
-	}
-
-	type Node struct {
-		Id    int
-		Name  string
-		Image string
-		Left  int
-		Right int
 	}
 
 	type TreeJSONRow struct {
@@ -96,24 +102,22 @@ func main() {
 		name := c.PostForm("name")
 		img := c.PostForm("image")
 		id := c.Query("id")
-		var left, right, foo int
+		var left, right int
 
 		row := db.QueryRow("SELECT lft, rgt FROM tree WHERE node_id = ?;",id)
 		err = row.Scan(&left, &right)
-		foo = left
+
 		log.Print(id," ", left," ", right)
-		if right - left > 1 {
-			//foo = right
-		}
-		_, err := db.Exec("UPDATE tree SET rgt = rgt + 2 WHERE rgt > ?;", foo)
+
+		_, err := db.Exec("UPDATE tree SET rgt = rgt + 2 WHERE rgt > ?;", left)
 		if err != nil {
 			fmt.Print(err.Error())
 		}
-		_, err = db.Exec("UPDATE tree SET lft = lft + 2 WHERE lft > ?;", foo)
+		_, err = db.Exec("UPDATE tree SET lft = lft + 2 WHERE lft > ?;", left)
 		if err != nil {
 			fmt.Print(err.Error())
 		}
-		_, err = db.Exec("INSERT INTO tree(name, image, lft, rgt) VALUES(?, ?, ? + 1, ? + 2);", name, img, foo, foo)
+		_, err = db.Exec("INSERT INTO tree(name, image, lft, rgt) VALUES(?, ?, ? + 1, ? + 2);", name, img, left, left)
 		if err != nil {
 			fmt.Print(err.Error())
 		}
