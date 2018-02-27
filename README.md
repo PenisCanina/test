@@ -1,16 +1,12 @@
 # test
 Test repo
-
-
 dependencies:
 
-  go:
-  
-    github.com/gin-gonic/gin
+  ## go: 
+     github.com/gin-gonic/gin    
+     github.com/go-sql-driver/mysql
     
-    github.com/go-sql-driver/mysql
-    
-  js:
+  ## js:
   
     react
     
