@@ -7,29 +7,20 @@ dependencies:
      github.com/go-sql-driver/mysql
     
   ## js:
-  
-    react
-    
-    axios
-    
+    react    
+    axios    
     serve
 
-run:
+## run:
 
-  backend:
-
+  ### backend:
     create mysql db
-
     configure /back/config.json with mysql user, password, host, db-name
-
     run setup.exe
-
     run rest.exe
 
-  frontend:
-
+  ### frontend:
     npm install -g serve
-
     serve -s build (in /front directory, app is then deployed to static server on port 5000)
 
 ...
